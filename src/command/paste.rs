@@ -1,7 +1,7 @@
 use crate::{
-    clipboard::clipboard::{create_clipboard, Clipboard},
-    utils::json::json_to_value,
     ClipboardPlugins,
+    clipboard::clipboard::{Clipboard, create_clipboard},
+    utils::json::json_to_value,
 };
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, IntoPipelineData, LabeledError, PipelineData, Type, Value};
@@ -47,16 +47,19 @@ impl PluginCommand for ClipboardPaste {
         if call.has_flag("raw").unwrap_or(false) {
             return Ok(Value::string(text, call.head).into_pipeline_data());
         }
-
-        match nu_json::from_str::<nu_json::Value>(&text) {
-            Ok(value) => json_to_value(value, call.head).map(|v| v.into_pipeline_data()),
-            Err(nu_json::Error::Syntax(_, _, _)) => {
-                Ok(Value::string(text, call.head).into_pipeline_data())
-            }
-            Err(e) => Err(LabeledError::new(format!(
-                "JSON Deserialization error: {}",
-                e
-            ))),
+        let trimmed = text.trim_start();
+        if trimmed.starts_with('{') || trimmed.starts_with('[') || trimmed.starts_with('"') {
+            return match nu_json::from_str::<nu_json::Value>(&text) {
+                Ok(value) => json_to_value(value, call.head).map(|v| v.into_pipeline_data()),
+                Err(nu_json::Error::Syntax(_, _, _)) => {
+                    Ok(Value::string(trimmed, call.head).into_pipeline_data())
+                }
+                Err(e) => Err(LabeledError::new(format!(
+                    "JSON Deserialization error: {}",
+                    e
+                ))),
+            };
         }
+        return Ok(Value::string(text, call.head).into_pipeline_data());
     }
 }
