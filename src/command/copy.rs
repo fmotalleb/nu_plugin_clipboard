@@ -1,5 +1,5 @@
 use crate::clipboard::clipboard::Clipboard;
-use crate::ClipboardPlugins;
+use crate::{ClipboardPlugins, utils::config};
 use crate::{clipboard::clipboard::create_clipboard, utils::json};
 use nu_plugin::{EngineInterface, EvaluatedCall, PluginCommand};
 use nu_protocol::{Category, IntoPipelineData, LabeledError, PipelineData, Signature, Type, Value};
@@ -49,6 +49,12 @@ impl PluginCommand for ClipboardCopy {
     fn signature(&self) -> Signature {
         Signature::build("clipboard copy")
             .input_output_types(vec![(Type::Any, Type::Any)])
+            .switch("silent", "Prevent output from being displayed", Some('s'))
+            .switch(
+                "no-silent",
+                "Force output to be displayed if silent flag is true (other wise nothing)",
+                Some('d'),
+            )
             .category(Category::System)
     }
 
@@ -65,7 +71,20 @@ impl PluginCommand for ClipboardCopy {
                 if let Err(err) = Self::copy(engine, &value) {
                     return Err(err);
                 }
-                Ok(value.into_pipeline_data())
+                let mut force_display: Option<bool> = None;
+                if Ok(true) == call.has_flag("silent") {
+                    force_display = Some(false)
+                }
+                if Ok(true) == call.has_flag("no-silent") {
+                    force_display = Some(true)
+                }
+                match (force_display, config::silent_copy(engine)) {
+                    (None, true) | (Some(false), _) => {
+                        Ok(Value::nothing(call.head).into_pipeline_data())
+                    }
+
+                    (None, false) | (Some(true), _) => Ok(value.into_pipeline_data()),
+                }
             }
             Err(err) => Err(LabeledError::new(err.to_string())),
         }

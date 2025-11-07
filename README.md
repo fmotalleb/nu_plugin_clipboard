@@ -5,15 +5,24 @@ A [nushell](https://www.nushell.sh/) plugin for interacting with the clipboard, 
 ## ✨ Features
 
 - **`clipboard copy`**: Copies input text to the clipboard.
-  - **Daemon Mode** (Linux only): Since version **0.105.2**, using env variables will try to detect display server.
+  - **Daemon Mode** (Linux only): Since version **0.105.2**, plugin will try to detect display server using env variables.
     If there is any issue with copy/paste command
     This config will override this behavior. If you need to override this, please file an issue:
-    
+
     ```bash
-    $env.config.plugins.clipboard.NO_DAEMON = true
+    $env.config.plugins.clipboard.NO_DAEMON = true # or false
     ```
 
-  - To make this setting permanent, add it to your `config env`.
+  - **Silent Copy**: Added support for silent copying (requested in [#23](https://github.com/fmotalleb/nu_plugin_clipboard/issues/23)).  
+    You can disable echoing of copied content globally with:
+
+    ```bash
+    $env.config.plugins.clipboard.SILENT_COPY = true
+    ```
+
+    or per invocation using `--silent (-s)` flag
+
+  - To make these settings permanent, add it to your env vars using `config env`.
 
 - **`clipboard paste`**: Retrieves the current clipboard content.
 
@@ -22,11 +31,10 @@ A [nushell](https://www.nushell.sh/) plugin for interacting with the clipboard, 
 If you encounter the error:
 `Error: × Clipboard Error: The clipboard contents were not available in the requested format...` on Linux:
 
-* For users running **Wayland** without the `nupm` installer, enable the `use-wayland` feature as described in [#21](https://github.com/FMotalleb/nu_plugin_clipboard/issues/21).
-* Alternatively, try disabling **daemon mode**, as explained in [#20](https://github.com/FMotalleb/nu_plugin_clipboard/issues/20).
+- For users running **Wayland** without the `nupm` installer, enable the `use-wayland` feature as described in [#21](https://github.com/FMotalleb/nu_plugin_clipboard/issues/21).
+- Alternatively, try disabling **daemon mode**, as explained in [#20](https://github.com/FMotalleb/nu_plugin_clipboard/issues/20).
 
 Note: These issues are already fixed internally. If you still need to rely on these workarounds, please open a new issue.
-
 
 ## 📌 Usage Examples
 
