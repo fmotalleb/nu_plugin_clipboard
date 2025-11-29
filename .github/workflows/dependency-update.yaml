@@ -12,7 +12,7 @@ jobs:
       - name: Setup Nushell
         uses: hustcer/setup-nu@main
         with:
-          version: "*"
+          version: "0.108.0"
       - uses: actions/checkout@v2
       - name: upgrade
         id: upgrade
