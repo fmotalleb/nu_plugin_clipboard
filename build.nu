@@ -34,7 +34,7 @@ def main [package_file: path = nupm.nuon] {
         | open $in
         | get toolchain?.channel?
         | default stable
-    let cmd = $"cargo +($channel) install --path \"($repo_root)\" --root \"($install_root)\" --features=($features | str join ",")"
+    let cmd = $"cargo +($channel) install --path '($repo_root)' --root '($install_root)' --features='($features | str join ",")'"
     log info $"building plugin using: (ansi blue)($cmd)(ansi reset)"
     nu -c $cmd
     let ext: string = if ($nu.os-info.name == 'windows') { '.exe' } else { '' }
