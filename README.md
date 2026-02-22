@@ -1,4 +1,12 @@
-# 📋 nu_plugin_clipboard
+# 📋 nu_plugin_clipboard (deprecated)
+
+Since 0.111.0 it will be included in the [nushell](https://www.nushell.sh/) itself and the plugin wont receive further updates.
+There are some changes in the commands:
+
+`clipboard copy` -> `clip copy` # does not passes the input to the output by default anymore.
+`clipboard paste` -> `clip paste`
+
+Importing `std/clip` shadows this implementation.
 
 A [nushell](https://www.nushell.sh/) plugin for interacting with the clipboard, allowing you to copy/paste text, objects, and tables.
 
